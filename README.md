@@ -17,3 +17,8 @@
 ```
   npm run migration:revert
 ```
+
+### create new module
+```
+  nest generate res module-name
+```
