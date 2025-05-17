@@ -4,14 +4,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthModule } from './auth/auth.module';
 import { JwtStrategy } from './common/strategies/jwt.strategy';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { StudentAdmissionModule } from './student-admission/student-admission.module';
+import { TeacherRecordModule } from './teacher-record/teacher-record.module';
 
 @Module({
+  providers: [JwtStrategy, AppService],
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
+
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         url: configService.get<string>('DATABASE_URL'),
@@ -21,7 +28,12 @@ import { JwtStrategy } from './common/strategies/jwt.strategy';
     }),
 
     AuthModule,
+
+    // MasterModule,
+
+    StudentAdmissionModule,
+
+    TeacherRecordModule,
   ],
-  providers: [JwtStrategy],
 })
-export class AppModule { }
+export class AppModule {}
