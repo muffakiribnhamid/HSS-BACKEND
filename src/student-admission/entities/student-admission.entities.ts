@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 @Entity({ name: 'studentAdmission' })
 export class StudentAdmission {
   @PrimaryGeneratedColumn()
@@ -57,4 +63,13 @@ export class StudentAdmission {
 
   @Column()
   aadhaarCard: string;
+
+  @Column()
+  activeStatus: Boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

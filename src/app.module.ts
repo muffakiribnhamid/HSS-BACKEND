@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { StudentAdmissionModule } from './student-admission/student-admission.module';
 import { TeacherRecordModule } from './teacher-record/teacher-record.module';
+import { MasterModule } from './master/master.module';
 
 @Module({
   providers: [JwtStrategy, AppService],
@@ -34,6 +35,8 @@ import { TeacherRecordModule } from './teacher-record/teacher-record.module';
     StudentAdmissionModule,
 
     TeacherRecordModule,
+
+    MasterModule,
   ],
 })
 export class AppModule {}
