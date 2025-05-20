@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Master } from './entities/master.entity';
 import { Repository } from 'typeorm';
 import { MasterDto } from './dto/master.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class MasterService {
@@ -11,26 +16,85 @@ export class MasterService {
     private readonly repo: Repository<Master>,
   ) {}
 
-  create(createMasterDto: MasterDto) {
-    return 'This action adds a new master';
+  async create(masterDto: MasterDto) {
+    const existing = await this.repo.findOne({
+      where: { email: masterDto.email },
+    });
+    if (existing) {
+      throw new ConflictException('Email already in use');
+    }
+
+    const hashedPassword = await bcrypt.hash(masterDto.password, 8);
+    const master = this.repo.create({
+      ...masterDto,
+      password: hashedPassword,
+      createdAt: new Date().toISOString(),
+    });
+
+    return await this.repo.save(master);
   }
 
-  async findOne(id: number) {
-    const master = await this.repo.findOne({ where: { id } });
-    return master;
-
-    return `This action returns a #${id} master`;
+  async findByEmail(email: string): Promise<Master> {
+    const user = await this.repo.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException(`User with email "${email}" not found`);
+    }
+    return user;
   }
 
-  findAll() {
-    return `This action returns all master`;
+  async findAll(): Promise<Master[]> {
+    return await this.repo.find();
   }
 
-  update(id: number, updateMasterDto: MasterDto) {
-    return `This action updates a #${id} master`;
+  async update(id: number, updateDto: MasterDto) {
+    const existing = await this.repo.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`User with id "${id}" not found`);
+    }
+    const updatedDetails = { ...updateDto, createdAt: new Date().toISOString() };
+
+    const updated = this.repo.merge(existing, updatedDetails);
+    return this.repo.save(updated);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} master`;
+  async remove(id: number) {
+    const result = await this.repo.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with id "${id}" not found`);
+    }
+    return { message: `User with id ${id} removed successfully` };
   }
 }
+
+// @Injectable()
+// export class MasterService {
+//   constructor(
+//     @InjectRepository(Master)
+//     private readonly repo: Repository<Master>,
+//   ) {}
+
+//   async create(masterDto: MasterDto) {
+//     const hasedPassword = await bcrypt.hash(masterDto.password, 8);
+//     const master = this.repo.create({
+//       ...masterDto,
+//       password: hasedPassword,
+//     });
+//     return await this.repo.save(master);
+//   }
+
+//   async findByEmail(email: string) {
+//     return this.repo.findOne({ where: { email } });
+//   }
+
+//   findAll() {
+//     return `This action returns all master`;
+//   }
+
+//   update(id: number, updateMasterDto: MasterDto) {
+//     return `This action updates a #${id} master`;
+//   }
+
+//   remove(id: number) {
+//     return `This action removes a #${id} master`;
+//   }
+// }

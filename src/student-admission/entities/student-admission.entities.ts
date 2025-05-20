@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 @Entity({ name: 'studentAdmission' })
 export class StudentAdmission {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   fullName: string;

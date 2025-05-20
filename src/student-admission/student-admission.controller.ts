@@ -35,7 +35,7 @@ export class StudentAdmissionController {
     @Body() dto: AdmissionDto,
     @Res() res: Response,
   ) {
-    const result = await this.service.update(+id, dto);
+    const result = await this.service.update(id, dto);
     return res.status(HttpStatus.OK).json({
       success: true,
       statusCode: HttpStatus.OK,
@@ -47,7 +47,7 @@ export class StudentAdmissionController {
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Res() res: Response) {
-    const result = await this.service.remove(+id);
+    const result = await this.service.remove(id);
     return res.status(HttpStatus.OK).json({
       success: true,
       statusCode: HttpStatus.OK,
@@ -81,7 +81,7 @@ export class StudentAdmissionController {
 
   @Get(':id')
   async findOne(@Param('id') id: string, @Res() res: Response) {
-    const result = await this.service.findOne(+id);
+    const result = await this.service.findOne(id);
     return res.status(HttpStatus.OK).json({
       success: true,
       statusCode: HttpStatus.OK,

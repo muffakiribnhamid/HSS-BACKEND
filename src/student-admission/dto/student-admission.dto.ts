@@ -1,5 +1,5 @@
 export interface AdmissionDto {
-  id?: number;
+  id?: string;
   fullName: string;
   address: string;
   dob: string;
