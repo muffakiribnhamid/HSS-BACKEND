@@ -8,5 +8,6 @@ import { Master } from './entities/master.entity';
   imports: [TypeOrmModule.forFeature([Master])],
   controllers: [MasterController],
   providers: [MasterService],
+  exports: [MasterService],
 })
 export class MasterModule {}

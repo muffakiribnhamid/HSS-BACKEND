@@ -19,7 +19,7 @@ export class StudentAdmissionService {
     return await this.repo.save(admission);
   }
 
-  async update(id: number, admissionDetails: AdmissionDto) {
+  async update(id: string, admissionDetails: AdmissionDto) {
     const existing = await this.repo.findOne({ where: { id } });
     if (!existing) {
       throw new NotFoundException(`Student admission with ID ${id} not found.`);
@@ -33,7 +33,7 @@ export class StudentAdmissionService {
     return await this.repo.save(updated);
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const student = await this.repo.findOne({ where: { id } });
     if (!student) {
       throw new NotFoundException(`Student admission with ID ${id} not found.`);
@@ -45,7 +45,7 @@ export class StudentAdmissionService {
     return await this.repo.find();
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const existing = await this.repo.findOne({ where: { id } });
     if (!existing) {
       throw new NotFoundException(`Student admission with ID ${id} not found.`);
