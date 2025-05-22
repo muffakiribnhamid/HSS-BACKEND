@@ -18,7 +18,7 @@ export class AuthController {
     }
     return {
       message: 'Token is valid',
-      user: isUserExist,
+      status: 200,
     };
   }
 
