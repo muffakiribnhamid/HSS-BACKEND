@@ -41,7 +41,7 @@ export class MasterService {
   async login(email: string, password: string) {
     const user = await this.findByEmail(email);
     if (user && await bcrypt.compare(password, user.password)) {
-      const token = this.jwtService.sign({email: user.email, id: user.id});
+      const token = this.jwtService.sign({email: email, sub: user.id});
       return {
         access_token: token,
       };
