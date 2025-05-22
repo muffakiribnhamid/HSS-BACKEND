@@ -2,29 +2,33 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Master } from './entities/master.entity';
 import { Repository } from 'typeorm';
 import { MasterDto } from './dto/master.dto';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class MasterService {
   constructor(
     @InjectRepository(Master)
     private readonly repo: Repository<Master>,
-  ) {}
+    private jwtService: JwtService,
+  ) { }
 
   async create(masterDto: MasterDto) {
+    const { email, password } = masterDto;
     const existing = await this.repo.findOne({
-      where: { email: masterDto.email },
+      where: { email },
     });
     if (existing) {
       throw new ConflictException('Email already in use');
     }
 
-    const hashedPassword = await bcrypt.hash(masterDto.password, 8);
+    const hashedPassword = await bcrypt.hash(password, 8);
     const master = this.repo.create({
       ...masterDto,
       password: hashedPassword,
@@ -32,6 +36,17 @@ export class MasterService {
     });
 
     return await this.repo.save(master);
+  }
+
+  async login(email: string, password: string) {
+    const user = await this.findByEmail(email);
+    if (user && await bcrypt.compare(password, user.password)) {
+      const token = this.jwtService.sign({email: user.email, id: user.id});
+      return {
+        access_token: token,
+      };
+    }
+    throw new UnauthorizedException('Invalid email or password');
   }
 
   async findByEmail(email: string): Promise<Master> {
