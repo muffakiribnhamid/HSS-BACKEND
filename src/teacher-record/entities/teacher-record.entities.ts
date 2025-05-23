@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  Timestamp,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -17,18 +18,18 @@ export class TeacherRecord {
   @Column()
   address: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()
   contact: string;
 
-  @Column()
+  @Column({ default: true })
   activeStatus: Boolean;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @CreateDateColumn({ default: Timestamp })
+  createdAt: Timestamp;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @UpdateDateColumn({ default: Timestamp })
+  updatedAt: Timestamp;
 }

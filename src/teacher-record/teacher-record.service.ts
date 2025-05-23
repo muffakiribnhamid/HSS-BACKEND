@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { TeacherRecordDTO } from './dto/teacher-record.dto';
+import { AddTeacherRecordDTO } from './dto/teacher-record.dto';
 import { TeacherRecord } from './entities/teacher-record.entities';
 import { Injectable, NotFoundException, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,49 +9,62 @@ import { Repository } from 'typeorm';
 export class TeacherRecordService {
   constructor(
     @InjectRepository(TeacherRecord)
-    private readonly repo: Repository<TeacherRecord>,
-  ) {}
+    private readonly repository: Repository<TeacherRecord>,
+  ) { }
 
   async create(
-    teacherDetails: TeacherRecordDTO,
-  ): Promise<{ message: string; teacher: TeacherRecord }> {
-    const newTeacher = this.repo.create({
+    teacherDetails: AddTeacherRecordDTO,
+  ){
+    const totalCount = await this.repository.count();
+    const paddedId = String(totalCount + 1).padStart(3, '0');
+
+    const emailParts = teacherDetails.email.split('@');
+    const uniqueEmail = `${emailParts[0]}${paddedId}@${emailParts[1]}`;
+
+    const newTeacher = this.repository.create({
       ...teacherDetails,
-      createdAt: new Date().toISOString(),
+      email: uniqueEmail,
     });
-    const savedTeacher = await this.repo.save(newTeacher);
-    return {
-      message: 'New teacher record has been created successfully.',
-      teacher: savedTeacher,
-    };
+
+    return await this.repository.save(newTeacher);
   }
 
-  async update(id: number, dto: TeacherRecordDTO) {
-    const teacher = await this.repo.preload({
+  async update(id: number, dto: AddTeacherRecordDTO) {
+    const teacher = await this.repository.preload({
       id,
       ...dto,
       updatedAt: new Date().toISOString(),
     });
     if (!teacher) throw new NotFoundException('Teacher not found');
-    const updated = await this.repo.save(teacher);
+    const updated = await this.repository.save(teacher);
     return { message: 'Teacher updated successfully', data: updated };
   }
 
-  async findAll() {
-    const teachers = await this.repo.find();
-    return { message: 'Teachers retrieved successfully', data: teachers };
+  async findAll(page: number, limit: number) {
+    const [data, total] = await this.repository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: 'ASC' }, // customize as needed
+    });
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };;
   }
 
   async findOne(id: number) {
-    const teacher = await this.repo.findOneBy({ id });
+    const teacher = await this.repository.findOneBy({ id });
     if (!teacher) throw new NotFoundException('Teacher not found');
     return { message: 'Teacher retrieved successfully', data: teacher };
   }
 
   async remove(id: number) {
-    const teacher = await this.repo.findOneBy({ id });
+    const teacher = await this.repository.findOneBy({ id });
     if (!teacher) throw new NotFoundException('Teacher not found');
-    await this.repo.remove(teacher);
+    await this.repository.remove(teacher);
     return { message: 'Teacher deleted successfully' };
   }
 }

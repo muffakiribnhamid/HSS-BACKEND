@@ -6,26 +6,7 @@ import { MasterService } from 'src/master/master.service';
 import * as bcrypt from 'bcrypt'
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService,  private masterService: MasterService,) { }
-
-
-    async validateUser(email: string, password: string) {
-    const user = await this.masterService.findByEmail(email);
-    if (user && await bcrypt.compare(password, user.password)) {
-      const { password, ...result } = user;
-      return result;
-    }
-    throw new UnauthorizedException('Invalid email or password');
-  }
-
-  async login(user: any) {
-    const payload = { username: user.email, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-      expires_in: '10h',
-    };
-  }
-
+  constructor(private jwtService: JwtService) { }
   
   // async validateUser(email: string, password: string): Promise<any> {
   //   if (email === 'test' && password === 'password') {

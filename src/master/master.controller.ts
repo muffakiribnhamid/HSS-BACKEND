@@ -9,6 +9,7 @@ import {
   UseGuards,
   ParseIntPipe,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { MasterService } from './master.service';
 import { MasterDto } from './dto/master.dto';
@@ -18,12 +19,22 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('master')
 export class MasterController {
-  constructor(private readonly masterService: MasterService) {}
+  constructor(private readonly masterService: MasterService) { }
 
   @Post()
   async create(@Body() createMasterDto: MasterDto) {
     return this.masterService.create(createMasterDto);
   }
+
+  @Post('login')
+  async login(@Body() body: { email: string; password: string }) {
+    const user = await this.masterService.login(body.email, body.password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Get(':email')
