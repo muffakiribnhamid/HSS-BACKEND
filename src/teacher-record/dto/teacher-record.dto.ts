@@ -1,10 +1,15 @@
-export interface TeacherRecordDTO {
-  id?: number;
+import { IsString, IsEmail } from 'class-validator';
+
+export class AddTeacherRecordDTO {
+  @IsString()
   fullName: string;
+
+  @IsString()
   address: string;
+
+  @IsEmail()
   email: string;
+
+  @IsString()
   contact: string;
-  activeStatus: Boolean;
-  createdAt?: Date;
-  editedAt?: Date;
 }
