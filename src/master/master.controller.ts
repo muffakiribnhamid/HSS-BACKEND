@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   NotFoundException,
   UnauthorizedException,
+  Query,
 } from '@nestjs/common';
 import { MasterService } from './master.service';
 import { MasterDto } from './dto/master.dto';
@@ -19,7 +20,35 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('master')
 export class MasterController {
-  constructor(private readonly masterService: MasterService) { }
+  constructor(private readonly masterService: MasterService) {}
+
+  @Post('forgot-password')
+  async sendOtp(@Body() body: { email: string }) {
+    return this.masterService.sendOtpForForgotPassword(body.email);
+  }
+
+  @Post('verify-otp')
+  async verifyOtp(@Body() body: { email: string; otp: string }) {
+    return this.masterService.verifyOtp(body.email, body.otp);
+  }
+
+  @Patch('reset-password')
+  async resetPassword(@Body() body: { email: string; newPassword: string }) {
+    return this.masterService.resetPassword(body.email, body.newPassword);
+  }
+
+  // @Patch('reset-password')
+  // async resetPassword(
+  //   @Body() body: { email: string; otp: string; newPassword: string },
+  // ) {
+  //   const { email, otp, newPassword } = body;
+  //   return this.masterService.resetPassword(email, otp, newPassword);
+  // }
+
+  // @Post('forgot-password')
+  // async sendOtp(@Body() body: { email: string }) {
+  //   return this.masterService.sendOtpForForgotPassword(body.email);
+  // }
 
   @Post()
   async create(@Body() createMasterDto: MasterDto) {
@@ -34,7 +63,6 @@ export class MasterController {
     }
     return user;
   }
-
 
   @UseGuards(JwtAuthGuard)
   @Get(':email')
