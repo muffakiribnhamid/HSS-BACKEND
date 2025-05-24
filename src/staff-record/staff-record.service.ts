@@ -2,7 +2,7 @@ import { AddStaffRecordDTO, UpdateStaffRecordDTO } from './dto/staff-record.dto'
 import { StaffRecord } from './entities/staff-record.entities';
 import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class StaffRecordService {
@@ -40,8 +40,28 @@ export class StaffRecordService {
     };
   }
 
-  async getStaffList(page: number, limit: number) {
+  async getStaffList(page: number, limit: number, userStatus: string, searchTerm: string) {
+    let userStatusCondition = {};
+
+    if (userStatus === 'active') {
+      userStatusCondition = { activeStatus: true };
+    } else if (userStatus === 'inactive') {
+      userStatusCondition = { activeStatus: false };
+    }
+
+    let whereCondition;
+    if (searchTerm) {
+      whereCondition = [
+        { ...userStatusCondition, fullName: ILike(`%${searchTerm}%`) },
+        { ...userStatusCondition, address: ILike(`%${searchTerm}%`) },
+        { ...userStatusCondition, contact: ILike(`%${searchTerm}%`) },
+      ];
+    } else {
+      whereCondition = userStatusCondition;
+    }
+
     const [data, total] = await this.repository.findAndCount({
+      where: whereCondition,
       skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'ASC' }, // customize as needed
@@ -52,21 +72,21 @@ export class StaffRecordService {
       page,
       limit,
       totalPages: Math.ceil(total / limit),
-    };;
+    };
   }
-  
+
   async removeStaff(uuid: string) {
     const staff = await this.repository.findOne({ where: { uuid } });
-  
+
     if (!staff) {
       throw new NotFoundException('Staff not found');
     }
-    
+
     staff.isDelete = true;
     staff.activeStatus = false;
-   
+
     await this.repository.save(staff);
-  
+
     return { message: 'Staff removed successfully' };
   }
 }

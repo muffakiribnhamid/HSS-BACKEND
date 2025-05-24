@@ -33,10 +33,15 @@ export class StaffRecordController {
   getStaffList(
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Query('staffStatus') status: string,
+    @Query('search') search: string,
   ) {
     const pageNum = Number(page) || 1;
     const limitNum = Number(limit) || 10;
-    return this.service.getStaffList(pageNum, limitNum);
+    console.log(status);
+    const staffStatus = status || 'All';
+    const searchTerm = search?.trim() || '';
+    return this.service.getStaffList(pageNum, limitNum, staffStatus, searchTerm);
   }
 
   @Delete('remove-staff/:uuid')
