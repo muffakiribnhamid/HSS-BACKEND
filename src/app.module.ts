@@ -7,7 +7,7 @@ import { JwtStrategy } from './common/strategies/jwt.strategy';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { StudentAdmissionModule } from './student-admission/student-admission.module';
-import { TeacherRecordModule } from './teacher-record/teacher-record.module';
+import { StaffRecordModule } from './staff-record/staff-record.module';
 import { MasterModule } from './master/master.module';
 import { StudentRecordModule } from './student-record/student-record.module';
 
@@ -35,7 +35,7 @@ import { StudentRecordModule } from './student-record/student-record.module';
 
     StudentAdmissionModule,
 
-    TeacherRecordModule,
+    StaffRecordModule,
 
     MasterModule,
 
