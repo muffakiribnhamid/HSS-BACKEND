@@ -39,7 +39,7 @@ export class StaffRecordController {
     const pageNum = Number(page) || 1;
     const limitNum = Number(limit) || 10;
     console.log(status);
-    const staffStatus = status || 'All';
+    const staffStatus = status?.trim() || '';
     const searchTerm = search?.trim() || '';
     return this.service.getStaffList(pageNum, limitNum, staffStatus, searchTerm);
   }
