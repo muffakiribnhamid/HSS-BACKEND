@@ -14,6 +14,9 @@ class AddStaffRecordDTO {
   @IsNotEmpty({ message: 'Contact is required' })
   contact: string;
 
+  @IsBoolean({ message: 'activeStatus must be a boolean value' })
+  activeStatus: boolean;
+
   @IsEnum(Role, {
     message: `Role must be one of: ${Object.values(Role).join(', ')}`,
   })

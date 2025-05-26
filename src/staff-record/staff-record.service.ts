@@ -17,7 +17,8 @@ export class StaffRecordService {
       return await this.repository.save(newStaff);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('Email already exists.');
+        console.log(error);
+        throw new ConflictException('Contact Number already exists.');
       }
       throw new InternalServerErrorException('Failed to add staff');
     }
@@ -67,8 +68,10 @@ export class StaffRecordService {
       take: limit,
       order: { createdAt: 'ASC' }, // customize as needed
     });
+    const filteredData = data.map(({ id, createdAt, updatedAt, ...rest }) => rest);
+
     return {
-      data,
+      data:filteredData,
       total,
       page,
       limit,
