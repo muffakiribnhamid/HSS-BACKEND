@@ -21,6 +21,12 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 export class MasterController {
   constructor(private readonly masterService: MasterService) { }
 
+  @Get()
+  postEmail() {
+    return this.masterService.postEmail()
+  }
+  
+
   @Post()
   async create(@Body() createMasterDto: MasterDto) {
     return this.masterService.create(createMasterDto);

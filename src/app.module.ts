@@ -10,6 +10,7 @@ import { StudentAdmissionModule } from './student-admission/student-admission.mo
 import { StaffRecordModule } from './staff-record/staff-record.module';
 import { MasterModule } from './master/master.module';
 import { StudentRecordModule } from './student-record/student-record.module';
+import { MailerModule } from './common/mailer/mailer.module';
 
 @Module({
   providers: [JwtStrategy, AppService],
@@ -28,17 +29,11 @@ import { StudentRecordModule } from './student-record/student-record.module';
         autoLoadEntities: true,
       }),
     }),
-
+    MailerModule,
     AuthModule,
-
-    // MasterModule,
-
-    StudentAdmissionModule,
-
-    StaffRecordModule,
-
     MasterModule,
-
+    StudentAdmissionModule,
+    StaffRecordModule,
     StudentRecordModule,
   ],
 })

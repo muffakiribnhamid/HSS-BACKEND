@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { MasterDto } from './dto/master.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { MailerService } from '../common/mailer/mailer.service';
 
 @Injectable()
 export class MasterService {
@@ -17,7 +18,16 @@ export class MasterService {
     @InjectRepository(Master)
     private readonly repo: Repository<Master>,
     private jwtService: JwtService,
+    private mailerService: MailerService,
   ) { }
+
+  async postEmail() {
+    await this.mailerService.sendEmail(
+      'connectideaz@gmail.com',
+      'Test Email from NestJS',
+      'This is a test email sent from MasterService.'
+    );
+  }
 
   async create(masterDto: MasterDto) {
     const { email, password } = masterDto;
@@ -41,7 +51,7 @@ export class MasterService {
   async login(email: string, password: string) {
     const user = await this.findByEmail(email);
     if (user && await bcrypt.compare(password, user.password)) {
-      const token = this.jwtService.sign({email: email, sub: user.id});
+      const token = this.jwtService.sign({ email: email, sub: user.id });
       return {
         access_token: token,
       };
