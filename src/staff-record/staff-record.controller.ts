@@ -38,15 +38,13 @@ export class StaffRecordController {
   ) {
     const pageNum = Number(page) || 1;
     const limitNum = Number(limit) || 10;
-    console.log(status);
-    console.log("status");
     const staffStatus = status?.trim() || '';
     const searchTerm = search?.trim() || '';
     return this.service.getStaffList(pageNum, limitNum, staffStatus, searchTerm);
   }
 
   @Delete('remove-staff/:uuid')
-  async removeStaff(@Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string) {
+  removeStaff(@Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string) {
     return this.service.removeStaff(uuid);
   }
 }

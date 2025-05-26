@@ -1,4 +1,4 @@
-import { StudentAdmission } from './student-admission/entities/student-admission.entities';
+import { Student } from './student-admission/entities/student.entities.js';
 import { DataSource } from 'typeorm';
 import { Auth } from './auth/entities/auth.entity';
 import * as dotenv from 'dotenv';
@@ -9,7 +9,7 @@ dotenv.config();
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  entities: [Auth, StudentAdmission],
+  entities: [Auth, Student],
   migrations: ['migrations/*.ts'],
   synchronize: false,
 });
