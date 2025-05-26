@@ -2,13 +2,19 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   PrimaryGeneratedColumn,
+  Timestamp,
   UpdateDateColumn,
 } from 'typeorm';
 @Entity({ name: 'studentAdmission' })
 export class StudentAdmission {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  @Generated('uuid')
+  uuid: string;
 
   @Column()
   fullName: string;
@@ -25,11 +31,11 @@ export class StudentAdmission {
   @Column({ type: 'date' })
   dob: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
-  @Column()
-  phone: string;
+  @Column({ unique: true })
+  contact: string;
 
   @Column()
   gradeApplyingFor: string;
@@ -46,13 +52,13 @@ export class StudentAdmission {
   @Column()
   accountHolderName: string;
 
-  @Column()
-  accountNumber: number;
+  @Column({ type: 'bigint', unique: true })
+  accountNumber: string;
 
   @Column()
   bankName: string;
 
-  @Column()
+  @Column({ unique: true })
   IFSCCode: string;
 
   @Column()
@@ -64,12 +70,15 @@ export class StudentAdmission {
   @Column()
   aadhaarCard: string;
 
-  @Column()
-  activeStatus: Boolean;
+  @Column({ default: true })
+  activeStatus: boolean;
+
+  @Column({default: false})
+  isDelete: boolean;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Timestamp;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Timestamp;
 }

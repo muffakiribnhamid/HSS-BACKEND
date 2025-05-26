@@ -1,60 +1,47 @@
-import {
-  AddAdmissionDto,
-  UpdateAdmissionDto,
-} from './dto/student-admission.dto';
-import { StudentAdmission } from './entities/student-admission.entities';
-import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { AddStaffRecordDTO, UpdateStaffRecordDTO } from './dto/staff-record.dto';
+import { StaffRecord } from './entities/staff-record.entities';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
 @Injectable()
-export class StudentAdmissionService {
+export class StaffRecordService {
   constructor(
-    @InjectRepository(StudentAdmission)
-    private readonly repo: Repository<StudentAdmission>,
-  ) {}
+    @InjectRepository(StaffRecord)
+    private readonly repository: Repository<StaffRecord>,
+  ) { }
 
-  async create(studentDetails: AddAdmissionDto) {
+  async addStaff(staffDetails: AddStaffRecordDTO) {
     try {
-      const newStudent = this.repo.create(studentDetails);
-      return await this.repo.save(newStudent);
+      const newStaff = this.repository.create({ ...staffDetails });
+      return await this.repository.save(newStaff);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException(error);
+        throw new ConflictException('Email already exists.');
       }
       throw new InternalServerErrorException('Failed to add staff');
     }
   }
-
-  async update(studentDetails: UpdateAdmissionDto) {
-    const { uuid } = studentDetails;
-    const staff = await this.repo.findOne({ where: { uuid } });
+  
+  async updateStaffInfo(updateStaffDto: UpdateStaffRecordDTO) {
+    const { uuid } = updateStaffDto;
+    const staff = await this.repository.findOne({ where: { uuid } });
 
     if (!staff) {
-      throw new NotFoundException();
+      throw new NotFoundException('Staff not found');
     }
 
-    Object.assign(staff, studentDetails);
+    Object.assign(staff, updateStaffDto);
 
-    const updated = await this.repo.save(staff);
+    const updated = await this.repository.save(staff);
 
     return {
-      message: 'student admission details updated successfully',
+      message: 'Staff updated successfully',
       data: updated,
     };
   }
 
-  async getStudentList(
-    page: number,
-    limit: number,
-    userStatus: string,
-    searchTerm: string,
-  ) {
+  async getStaffList(page: number, limit: number, userStatus: string, searchTerm: string) {
     let userStatusCondition = {};
 
     if (userStatus === 'active') {
@@ -74,7 +61,7 @@ export class StudentAdmissionService {
       whereCondition = userStatusCondition;
     }
 
-    const [data, total] = await this.repo.findAndCount({
+    const [data, total] = await this.repository.findAndCount({
       where: whereCondition,
       skip: (page - 1) * limit,
       take: limit,
@@ -89,8 +76,8 @@ export class StudentAdmissionService {
     };
   }
 
-  async removeStudent(uuid: string) {
-    const staff = await this.repo.findOne({ where: { uuid } });
+  async removeStaff(uuid: string) {
+    const staff = await this.repository.findOne({ where: { uuid } });
 
     if (!staff) {
       throw new NotFoundException('Staff not found');
@@ -99,9 +86,8 @@ export class StudentAdmissionService {
     staff.isDelete = true;
     staff.activeStatus = false;
 
-    await this.repo.save(staff);
+    await this.repository.save(staff);
 
-    return { message: 'student removed successfully' };
+    return { message: 'Staff removed successfully' };
   }
-
 }
