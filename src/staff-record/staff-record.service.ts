@@ -22,6 +22,7 @@ export class StaffRecordService {
       throw new InternalServerErrorException('Failed to add staff');
     }
   }
+  
   async updateStaffInfo(updateStaffDto: UpdateStaffRecordDTO) {
     const { uuid } = updateStaffDto;
     const staff = await this.repository.findOne({ where: { uuid } });

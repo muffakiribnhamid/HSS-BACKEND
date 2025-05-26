@@ -14,7 +14,7 @@ import {
 import { StaffRecordService } from './staff-record.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('staff-record')
 export class StaffRecordController {
   constructor(private readonly service: StaffRecordService) { }
@@ -39,6 +39,7 @@ export class StaffRecordController {
     const pageNum = Number(page) || 1;
     const limitNum = Number(limit) || 10;
     console.log(status);
+    console.log("status");
     const staffStatus = status?.trim() || '';
     const searchTerm = search?.trim() || '';
     return this.service.getStaffList(pageNum, limitNum, staffStatus, searchTerm);
