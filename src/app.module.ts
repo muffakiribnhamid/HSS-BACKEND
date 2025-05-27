@@ -11,6 +11,7 @@ import { StaffRecordModule } from './staff-record/staff-record.module';
 import { MasterModule } from './master/master.module';
 import { StudentRecordModule } from './student-record/student-record.module';
 import { MailerModule } from './common/mailer/mailer.module';
+import { NoticeModule } from './notice/notice.module';
 
 @Module({
   providers: [JwtStrategy, AppService],
@@ -35,6 +36,7 @@ import { MailerModule } from './common/mailer/mailer.module';
     StudentAdmissionModule,
     StaffRecordModule,
     StudentRecordModule,
+    NoticeModule,
   ],
 })
 export class AppModule {}

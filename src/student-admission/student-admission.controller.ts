@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Query,
   ParseUUIDPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { StudentAdmissionService } from './student-admission.service';
 import {
@@ -58,53 +59,16 @@ export class StudentAdmissionController {
   ) {
     return this.service.removeStudent(uuid);
   }
-
-
   
-
-  // @Delete(':id')
-  // async remove(@Param('id') id: string, @Res() res: Response) {
-  //   const result = await this.service.remove(id);
-  //   return res.status(HttpStatus.OK).json({
-  //     success: true,
-  //     statusCode: HttpStatus.OK,
-  //     message: result.message,
-  //     timestamp: new Date().toISOString(),
-  //   });
-  // }
-
-  // @Delete()
-  // async removeAll(@Res() res: Response) {
-  //   const result = await this.service.removeAll();
-  //   return res.status(HttpStatus.OK).json({
-  //     success: true,
-  //     statusCode: HttpStatus.OK,
-  //     message: result.message,
-  //     timestamp: new Date().toISOString(),
-  //   });
-  // }
-
-  // @Get()
-  // async getAll(@Res() res: Response) {
-  //   const result = await this.service.getAll();
-  //   return res.status(HttpStatus.OK).json({
-  //     success: true,
-  //     statusCode: HttpStatus.OK,
-  //     message: 'Fetched all student admission records.',
-  //     timestamp: new Date().toISOString(),
-  //     data: result,
-  //   });
-  // }
-
-  // @Get(':id')
-  // async findOne(@Param('id') id: string, @Res() res: Response) {
-  //   const result = await this.service.findOne(id);
-  //   return res.status(HttpStatus.OK).json({
-  //     success: true,
-  //     statusCode: HttpStatus.OK,
-  //     message: `Fetched student admission with ID ${id}.`,
-  //     timestamp: new Date().toISOString(),
-  //     data: result,
-  //   });
-  // }
+  @Get("student")
+  async getStudentByNameAndDob(
+    @Query('contact') contact: string,
+    @Query('gradeApplyingFor') gradeApplyingFor: string,
+    @Query('email') email: string
+  ) {
+    if (!contact || !gradeApplyingFor || !email) {
+      throw new NotFoundException();
+    }
+    return await this.service.getStudent(contact, gradeApplyingFor, email);
+  }
 }
