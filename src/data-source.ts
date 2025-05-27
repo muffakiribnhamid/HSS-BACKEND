@@ -1,12 +1,12 @@
-import { Student } from './student-admission/entities/student.entities.js';
+import { Student } from './student-admission/entities/student.entities';
 import { DataSource } from 'typeorm';
 import { Auth } from './auth/entities/auth.entity';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import { AcademicInfo } from './student-admission/entities/academic-info.entities.js';
-import { BankDetails } from './student-admission/entities/bank-details.entities.js';
-import { StaffRecord } from './staff-record/entities/staff-record.entities.js';
-import { Master } from './master/entities/master.entity.js';
+import { AcademicInfo } from './student-admission/entities/academic-info.entities';
+import { BankDetails } from './student-admission/entities/bank-details.entities';
+import { StaffRecord } from './staff-record/entities/staff-record.entities';
+import { Master } from './master/entities/master.entity';
 
 dotenv.config();
 
