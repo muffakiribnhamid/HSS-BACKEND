@@ -90,14 +90,13 @@ export class StudentAdmissionService {
 
     if (!student) throw new NotFoundException('Student not found');
 
-    console.log(student);
-    const match = student.academicInfo?.some(
-      (info) => info.gradeApplyingFor === dto.gradeApplyingFor,
-    );
+    // const match = student.academicInfo?.some(
+    //   (info) => info.gradeApplyingFor === dto.gradeApplyingFor,
+    // );
 
-    if (match) {
-      throw new ConflictException('Student with this email, phone number and grade already exists');
-    }
+    // if (match) {
+    //   throw new ConflictException('Student with this email, phone number and grade already exists');
+    // }
 
     Object.assign(student, {
       fullName: dto.fullName,
