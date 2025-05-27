@@ -40,8 +40,6 @@ export class StudentAdmissionService {
         (info) => info.gradeApplyingFor === dto.gradeApplyingFor,
       ),
     );
-    
-    console.log(match);
 
     if (match) {
       throw new ConflictException('Student with this email, phone number and grade already exists');
