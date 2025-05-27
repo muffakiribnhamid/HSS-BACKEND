@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Query,
   ParseUUIDPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { StudentAdmissionService } from './student-admission.service';
 import {
@@ -51,4 +52,17 @@ export class StudentAdmissionController {
   removeStaff(@Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string) {
     return this.service.removeStudent(uuid);
   }
+  
+  @Get("student")
+  async getStudentByNameAndDob(
+    @Query('contact') contact: string,
+    @Query('gradeApplyingFor') gradeApplyingFor: string,
+    @Query('email') email: string
+  ) {
+    if (!contact || !gradeApplyingFor || !email) {
+      throw new NotFoundException();
+    }
+    return await this.service.getStudent(contact, gradeApplyingFor, email);
+  }
+
 }

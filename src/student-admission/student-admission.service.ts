@@ -257,4 +257,14 @@ export class StudentAdmissionService {
     return { message: 'Staff removed successfully' };
   }
 
+  async getStudent(contact: string, gradeApplyingFor:string, email: string) {
+    const student = await this.repo.findOne({
+      where: { contact, gradeApplyingFor, email },
+    });
+    if (!student) {
+      throw new NotFoundException('Student not found with given name and DOB');
+    }
+    return student;
+  }
 }
+
