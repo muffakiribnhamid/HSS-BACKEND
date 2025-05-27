@@ -27,15 +27,24 @@ export class StudentAdmissionService {
 
   async addStudent(dto: AddStudentDto): Promise<Student> {
 
-    const existing = await this.studentRepo.findOne({
+    const existingStudents = await this.studentRepo.find({
       where: {
         email: dto.email,
         phoneNumber: dto.phoneNumber,
       },
+      relations: ['academicInfo'],
     });
+    
+    const match = existingStudents?.find((student) =>
+      student.academicInfo?.some(
+        (info) => info.gradeApplyingFor === dto.gradeApplyingFor,
+      ),
+    );
+    
+    console.log(match);
 
-    if (existing) {
-      throw new ConflictException('Student with this email and phone number already exists');
+    if (match) {
+      throw new ConflictException('Student with this email, phone number and grade already exists');
     }
 
     const student = this.studentRepo.create({
