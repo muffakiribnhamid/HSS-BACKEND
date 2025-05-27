@@ -258,8 +258,15 @@ export class StudentAdmissionService {
   }
 
   async getStudent(contact: string, gradeApplyingFor:string, email: string) {
-    const student = await this.repo.findOne({
-      where: { contact, gradeApplyingFor, email },
+    const student = await this.studentRepo.findOne({
+      where: {
+        phoneNumber:contact,
+        email,
+        academicInfo: {
+          gradeApplyingFor,
+        },
+      },
+      relations: ['academicInfo'],
     });
     if (!student) {
       throw new NotFoundException('Student not found with given name and DOB');
