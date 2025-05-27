@@ -39,4 +39,9 @@ export class StudentAdmissionController {
     const searchTerm = search?.trim() || '';
     return this.service.getStudentsList(pageNum, limitNum, studentStatus, searchTerm);
   }
+
+  @Delete('remove-student/:uuid')
+  removeStaff(@Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string) {
+    return this.service.removeStudent(uuid);
+  }
 }

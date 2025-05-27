@@ -53,6 +53,9 @@ class AddStudentDto {
 
   @IsBoolean()
   isDelete: boolean;
+
+  @IsBoolean()
+  terms?: boolean;
 }
 
 export  {AddStudentDto} 

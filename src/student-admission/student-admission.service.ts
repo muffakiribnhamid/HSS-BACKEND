@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, In, Repository } from 'typeorm';
 import { AddStudentDto } from './dto/student-admission.dto';
 import { Student } from './entities/student.entities';
 import { AcademicInfo } from './entities/academic-info.entities';
@@ -76,7 +76,7 @@ export class StudentAdmissionService {
   }
 
   async getStudentsList(page: number, limit: number, studentStatus: string, searchTerm: string) {
-    const whereConditions: any = { isDelete: false }; // You can add isApprove: true if needed
+    const whereConditions: any = { isDelete: false };
 
     if (searchTerm) {
       whereConditions.fullName = ILike(`%${searchTerm}%`);
@@ -85,31 +85,81 @@ export class StudentAdmissionService {
     // Fetch data with relations
     const [students, total] = await this.studentRepo.findAndCount({
       where: whereConditions,
-      relations: ['academicInfo', 'bankDetails'],
       skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'DESC' },
     });
 
-    const data = students.map(student => ({
-      studentDetails: {
-        id: student.id,
-        fullName: student.fullName,
-        address: student.address,
-        gender: student.gender,
-        dob: student.dob,
-        fatherName: student.fatherName,
-        motherName: student.motherName,
-        email: student.email,
-        phoneNumber: student.phoneNumber,
-        isApprove: student.isApprove,
-        isDelete: student.isDelete,
-        createdAt: student.createdAt,
-        updatedAt: student.updatedAt,
-      },
-      academicDetails: student.academicInfo?.[0] || {},
-      bankDetails: student.bankDetails?.[0] || {},
-    }));
+    const studentIds = students.map(s => s.id);
+
+    if (studentIds.length === 0) {
+      // No students found, return empty
+      return {
+        data: [],
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      };
+    }
+
+    const [academicInfos, bankDetails] = await Promise.all([
+      this.academicRepo.find({
+        where: { student: In(studentIds), isDelete: false },
+      }),
+      this.bankRepo.find({
+        where: { student: In(studentIds), isDelete: false },
+      }),
+    ]);
+
+    const academicInfoMap = academicInfos.reduce((acc, item) => {
+      acc[item.studentId] = item;
+      return acc;
+    }, {});
+
+    const bankDetailsMap = bankDetails.reduce((acc, item) => {
+      acc[item.studentId] = item;
+      return acc;
+    }, {});
+
+    const data = students.map(student => {
+      const {
+        id: _aId,
+        studentId: _aStudentId,
+        createdAt: _aCreated,
+        updatedAt: _aUpdated,
+        isApprove: _aIsApprove,
+        isDelete: _aIsDelete,
+        ...academicDetails
+      } = academicInfoMap[student.id] || {};
+
+      const {
+        id: _bId,
+        studentId: _bStudentId,
+        createdAt: _bCreated,
+        updatedAt: _bUpdated,
+        isApprove: _bIsApprove,
+        isDelete: _bIsDelete,
+        ...bankDetails
+      } = bankDetailsMap[student.id] || {};
+
+      return {
+        studentDetails: {
+          uuid: student.id,
+          fullName: student.fullName,
+          address: student.address,
+          gender: student.gender,
+          dob: student.dob,
+          fatherName: student.fatherName,
+          motherName: student.motherName,
+          email: student.email,
+          phoneNumber: student.phoneNumber,
+          isApprove: student.isApprove,
+        },
+        academicDetails,
+        bankDetails,
+      };
+    });
 
     return {
       data,
@@ -118,6 +168,21 @@ export class StudentAdmissionService {
       limit,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  async removeStudent(uuid: string) {
+    const student = await this.studentRepo.findOne({ where: { id:uuid } });
+
+    if (!student) {
+      throw new NotFoundException('Staff not found');
+    }
+
+    student.isDelete = true;
+    // student.isApprove = false;
+
+    // await this.studentRepo.save(student);
+
+    return { message: 'Staff removed successfully' };
   }
 
 }

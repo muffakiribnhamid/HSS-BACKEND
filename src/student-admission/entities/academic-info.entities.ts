@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { CoreEntity } from './core.entities';
 import { Student } from './student.entities';
 
@@ -13,6 +13,10 @@ export class AcademicInfo extends CoreEntity {
   @Column()
   shortIntroduction: string;
 
-  @ManyToOne(() => Student, student => student.academicInfo)
+  @Column({ type: 'uuid' })
+  studentId: string;
+  
+  @ManyToOne(() => Student, student => student.academicInfo, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'studentId' })
   student: Student;
 }

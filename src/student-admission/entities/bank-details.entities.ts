@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { CoreEntity } from './core.entities';
 import { Student } from './student.entities';
 
@@ -16,6 +16,11 @@ export class BankDetails extends CoreEntity {
   @Column()
   IFSCCode: string;
 
-  @ManyToOne(() => Student, student => student.bankDetails)
+  @Column({ type: 'uuid' })
+  studentId: string;
+
+  // Relation to Student
+  @ManyToOne(() => Student, student => student.bankDetails, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'studentId' })
   student: Student;
 }
