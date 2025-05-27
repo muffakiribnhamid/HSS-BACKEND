@@ -23,7 +23,7 @@ export class MasterService {
 
   async postEmail() {
     await this.mailerService.sendEmail(
-      'connectideaz@gmail.com',
+      'hssmunadkulgam@gmail.com',
       'Test Email from NestJS',
       'This is a test email sent from MasterService.'
     );

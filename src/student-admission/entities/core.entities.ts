@@ -8,7 +8,7 @@ export abstract class CoreEntity {
   isDelete: boolean;
 
   @Column({ default: false })
-  isApprove: boolean;
+  activeStatus: boolean;
 
   @CreateDateColumn()
   createdAt: Timestamp;

@@ -54,7 +54,7 @@ export class StudentAdmissionService {
       motherName: dto.motherName,
       email: dto.email,
       phoneNumber: dto.phoneNumber,
-      isApprove: dto.isApprove,
+      activeStatus: dto.activeStatus,
       isDelete: dto.isDelete,
     });
 
@@ -90,6 +90,15 @@ export class StudentAdmissionService {
 
     if (!student) throw new NotFoundException('Student not found');
 
+    console.log(student);
+    const match = student.academicInfo?.some(
+      (info) => info.gradeApplyingFor === dto.gradeApplyingFor,
+    );
+
+    if (match) {
+      throw new ConflictException('Student with this email, phone number and grade already exists');
+    }
+
     Object.assign(student, {
       fullName: dto.fullName,
       address: dto.address,
@@ -99,7 +108,7 @@ export class StudentAdmissionService {
       motherName: dto.motherName,
       email: dto.email,
       phoneNumber: dto.phoneNumber,
-      isApprove: dto.isApprove,
+      isApprove: dto.activeStatus,
       isDelete: dto.isDelete,
     });
 
@@ -130,24 +139,37 @@ export class StudentAdmissionService {
   }
 
   async getStudentsList(page: number, limit: number, studentStatus: string, searchTerm: string) {
-    const whereConditions: any = { isDelete: false };
+    let userStatusCondition = {};
 
+    if (studentStatus === 'active') {
+      userStatusCondition = { activeStatus: true };
+    } else if (studentStatus === 'inactive') {
+      userStatusCondition = { activeStatus: false };
+    }
+    console.log(userStatusCondition);
+
+    let whereCondition;
     if (searchTerm) {
-      whereConditions.fullName = ILike(`%${searchTerm}%`);
+      whereCondition = [
+        { ...userStatusCondition, fullName: ILike(`%${searchTerm}%`) },
+        { ...userStatusCondition, address: ILike(`%${searchTerm}%`) },
+        { ...userStatusCondition, phoneNumber: ILike(`%${searchTerm}%`) },
+        { ...userStatusCondition, email: ILike(`%${searchTerm}%`) },
+      ];
+    } else {
+      whereCondition = userStatusCondition;
     }
 
-    // Fetch data with relations
     const [students, total] = await this.studentRepo.findAndCount({
-      where: whereConditions,
+      where: whereCondition,
       skip: (page - 1) * limit,
       take: limit,
-      order: { createdAt: 'DESC' },
+      order: { createdAt: 'ASC' },
     });
 
     const studentIds = students.map(s => s.id);
 
     if (studentIds.length === 0) {
-      // No students found, return empty
       return {
         data: [],
         total,
@@ -190,7 +212,7 @@ export class StudentAdmissionService {
         studentId: _bStudentId,
         createdAt: _bCreated,
         updatedAt: _bUpdated,
-        isApprove: _bIsApprove,
+        activeStatus: _bActiveStatus,
         isDelete: _bIsDelete,
         ...bankDetails
       } = bankDetailsMap[student.id] || {};
@@ -206,7 +228,7 @@ export class StudentAdmissionService {
           motherName: student.motherName,
           email: student.email,
           phoneNumber: student.phoneNumber,
-          isApprove: student.isApprove,
+          activeStatus: student.activeStatus,
         },
         academicDetails,
         bankDetails,

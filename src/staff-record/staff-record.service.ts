@@ -66,7 +66,7 @@ export class StaffRecordService {
       where: whereCondition,
       skip: (page - 1) * limit,
       take: limit,
-      order: { createdAt: 'ASC' }, // customize as needed
+      order: { createdAt: 'ASC' },
     });
     const filteredData = data.map(({ id, createdAt, updatedAt, ...rest }) => rest);
 
