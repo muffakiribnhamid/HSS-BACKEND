@@ -42,6 +42,7 @@ export class StudentAdmissionController {
     const pageNum = Number(page) || 1;
     const limitNum = Number(limit) || 10;
     const studentStatus = status?.trim() || '';
+    console.log('innn',studentStatus);
     const searchTerm = search?.trim() || '';
     return this.service.getStudentsList(pageNum, limitNum, studentStatus, searchTerm);
   }

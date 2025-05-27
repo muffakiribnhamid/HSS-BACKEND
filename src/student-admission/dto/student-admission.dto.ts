@@ -49,7 +49,7 @@ class AddStudentDto {
   IFSCCode: string;
 
   @IsBoolean()
-  isApprove: boolean;
+  activeStatus: boolean;
 
   @IsBoolean()
   isDelete: boolean;
