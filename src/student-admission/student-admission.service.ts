@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, Repository } from 'typeorm';
-import { AddStudentDto } from './dto/student-admission.dto';
+import { AddStudentDto, UpdateStudentRecordDTO } from './dto/student-admission.dto';
 import { Student } from './entities/student.entities';
 import { AcademicInfo } from './entities/academic-info.entities';
 import { BankDetails } from './entities/bank-details.entities';
@@ -34,7 +34,7 @@ export class StudentAdmissionService {
       },
       relations: ['academicInfo'],
     });
-    
+
     const match = existingStudents?.find((student) =>
       student.academicInfo?.some(
         (info) => info.gradeApplyingFor === dto.gradeApplyingFor,
@@ -58,7 +58,6 @@ export class StudentAdmissionService {
       isDelete: dto.isDelete,
     });
 
-
     const savedStudent = await this.studentRepo.save(student);
 
     const academicInfo = this.academicRepo.create({
@@ -80,6 +79,54 @@ export class StudentAdmissionService {
     await this.bankRepo.save(bankInfo);
 
     return savedStudent;
+  }
+
+  async updateStudentInfo(dto: UpdateStudentRecordDTO) {
+    const { uuid, academicInfoId, bankDetailsId } = dto;
+    const student = await this.studentRepo.findOne({
+      where: { id: uuid },
+      relations: ['academicInfo', 'bankDetails'],
+    });
+
+    if (!student) throw new NotFoundException('Student not found');
+
+    Object.assign(student, {
+      fullName: dto.fullName,
+      address: dto.address,
+      gender: dto.gender,
+      dob: dto.dob,
+      fatherName: dto.fatherName,
+      motherName: dto.motherName,
+      email: dto.email,
+      phoneNumber: dto.phoneNumber,
+      isApprove: dto.isApprove,
+      isDelete: dto.isDelete,
+    });
+
+    await this.studentRepo.save(student);
+
+    const academicInfo = await this.academicRepo.findOne({ where: { id: academicInfoId } });
+    if (academicInfo) {
+      Object.assign(academicInfo, {
+        gradeApplyingFor: dto.gradeApplyingFor,
+        previousSchool: dto.previousSchool,
+        shortIntroduction: dto.shortIntroduction,
+      });
+      await this.academicRepo.save(academicInfo);
+    }
+
+    const bankDetail = await this.bankRepo.findOne({ where: { id: bankDetailsId } });
+    if (bankDetail) {
+      Object.assign(bankDetail, {
+        accountHolderName: dto.accountHolderName,
+        accountNumber: dto.accountNumber,
+        bankName: dto.bankName,
+        IFSCCode: dto.IFSCCode,
+      });
+      await this.bankRepo.save(bankDetail);
+    }
+
+    return 'done';
   }
 
   async getStudentsList(page: number, limit: number, studentStatus: string, searchTerm: string) {
@@ -131,7 +178,6 @@ export class StudentAdmissionService {
 
     const data = students.map(student => {
       const {
-        id: _aId,
         studentId: _aStudentId,
         createdAt: _aCreated,
         updatedAt: _aUpdated,
@@ -141,7 +187,6 @@ export class StudentAdmissionService {
       } = academicInfoMap[student.id] || {};
 
       const {
-        id: _bId,
         studentId: _bStudentId,
         createdAt: _bCreated,
         updatedAt: _bUpdated,
@@ -178,7 +223,7 @@ export class StudentAdmissionService {
   }
 
   async removeStudent(uuid: string) {
-    const student = await this.studentRepo.findOne({ where: { id:uuid } });
+    const student = await this.studentRepo.findOne({ where: { id: uuid } });
 
     if (!student) {
       throw new NotFoundException('Staff not found');

@@ -13,7 +13,8 @@ import {
 } from '@nestjs/common';
 import { StudentAdmissionService } from './student-admission.service';
 import {
-  AddStudentDto
+  AddStudentDto,
+  UpdateStudentRecordDTO
 } from './dto/student-admission.dto';
 import { Response } from 'express';
 
@@ -24,6 +25,11 @@ export class StudentAdmissionController {
   @Post('add-student')
   addStudent(@Body() dto: AddStudentDto) {
     return this.service.addStudent(dto);
+  }
+
+  @Patch('update-student')
+  updateStudentInfo(@Body() staffDetails: UpdateStudentRecordDTO) {
+    return this.service.updateStudentInfo(staffDetails);
   }
 
   @Get('get-students')
