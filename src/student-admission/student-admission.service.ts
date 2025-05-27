@@ -138,14 +138,13 @@ export class StudentAdmissionService {
   }
 
   async getStudentsList(page: number, limit: number, studentStatus: string, searchTerm: string) {
-    let userStatusCondition = {};
+    let userStatusCondition: any = { isDelete: false };
 
     if (studentStatus === 'active') {
-      userStatusCondition = { activeStatus: true };
+      userStatusCondition.activeStatus = true;
     } else if (studentStatus === 'inactive') {
-      userStatusCondition = { activeStatus: false };
+      userStatusCondition.activeStatus = false;
     }
-    console.log(userStatusCondition);
 
     let whereCondition;
     if (searchTerm) {
@@ -251,9 +250,9 @@ export class StudentAdmissionService {
     }
 
     student.isDelete = true;
-    // student.isApprove = false;
+    student.activeStatus = false;
 
-    // await this.studentRepo.save(student);
+    await this.studentRepo.delete(student);
 
     return { message: 'Staff removed successfully' };
   }

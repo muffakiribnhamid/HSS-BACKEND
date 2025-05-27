@@ -43,12 +43,13 @@ export class StaffRecordService {
   }
 
   async getStaffList(page: number, limit: number, userStatus: string, searchTerm: string) {
-    let userStatusCondition = {};
+    let userStatusCondition: any = { isDelete: false };
+
 
     if (userStatus === 'active') {
-      userStatusCondition = { activeStatus: true };
+      userStatusCondition.activeStatus = true;
     } else if (userStatus === 'inactive') {
-      userStatusCondition = { activeStatus: false };
+      userStatusCondition.activeStatus = false;
     }
 
     let whereCondition;
