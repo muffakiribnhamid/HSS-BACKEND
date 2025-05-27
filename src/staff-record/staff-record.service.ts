@@ -43,12 +43,13 @@ export class StaffRecordService {
   }
 
   async getStaffList(page: number, limit: number, userStatus: string, searchTerm: string) {
-    let userStatusCondition = {};
+    let userStatusCondition: any = { isDelete: false };
+
 
     if (userStatus === 'active') {
-      userStatusCondition = { activeStatus: true };
+      userStatusCondition.activeStatus = true;
     } else if (userStatus === 'inactive') {
-      userStatusCondition = { activeStatus: false };
+      userStatusCondition.activeStatus = false;
     }
 
     let whereCondition;
@@ -66,7 +67,7 @@ export class StaffRecordService {
       where: whereCondition,
       skip: (page - 1) * limit,
       take: limit,
-      order: { createdAt: 'ASC' }, // customize as needed
+      order: { createdAt: 'ASC' },
     });
     const filteredData = data.map(({ id, createdAt, updatedAt, ...rest }) => rest);
 
