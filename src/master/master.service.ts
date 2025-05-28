@@ -21,11 +21,20 @@ export class MasterService {
     private mailerService: MailerService,
   ) { }
 
-  async postEmail() {
+  async postFeedback(emailDto) {
     await this.mailerService.sendEmail(
-      'hssmunadkulgam@gmail.com',
-      'Test Email from NestJS',
-      'This is a test email sent from MasterService.'
+      emailDto.email,
+      'User Feedback',
+      `Hi this is ${emailDto.name} and this is my email ${emailDto.email}. my feedback is ${emailDto.message}`
+    );
+  }
+
+  async submitJoiningRequest(emailDto) {
+    const {fullName, email, ...rest} = emailDto;
+    await this.mailerService.sendEmailForJoin(
+      emailDto.email,
+      'Joining Request',
+      `Hi this is ${fullName} and this is my email ${email}. i want to apply for you school here my details ${JSON.stringify(rest)}`
     );
   }
 
