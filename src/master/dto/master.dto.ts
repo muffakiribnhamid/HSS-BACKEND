@@ -75,10 +75,6 @@ export class JoinRequestDto {
 
   @IsString()
   @IsNotEmpty()
-  accountHolder: string;
-
-  @IsString()
-  @IsNotEmpty()
   accountHolderName: string;
 
   @IsString()
