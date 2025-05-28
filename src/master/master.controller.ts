@@ -12,7 +12,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { MasterService } from './master.service';
-import { MasterDto } from './dto/master.dto';
+import { EmailDto, JoinRequestDto, MasterDto } from './dto/master.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 // @UseGuards(JwtAuthGuard)
@@ -21,11 +21,15 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 export class MasterController {
   constructor(private readonly masterService: MasterService) { }
 
-  @Get('post-email')
-  postEmail() {
-    return this.masterService.postEmail()
+  @Post('submit-feedback')
+  postEmail(@Body() emailDto: EmailDto) {
+    return this.masterService.postFeedback(emailDto)
   }
   
+  @Post('submit-joining-request')
+  submitJoiningRequest(@Body() emailDto: JoinRequestDto) {
+    return this.masterService.submitJoiningRequest(emailDto)
+  }
 
   @Post()
   async create(@Body() createMasterDto: MasterDto) {
