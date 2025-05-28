@@ -22,3 +22,12 @@
 ```
   nest generate res module-name
 ```
+
+### run backend on aws
+```
+npm run build
+
+pm2 delete student-backend
+
+pm2 start dist/src/main.js --name student-backend --watch --watch-delay 1000
+```
