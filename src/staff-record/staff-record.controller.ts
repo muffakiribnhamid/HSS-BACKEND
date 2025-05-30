@@ -23,6 +23,11 @@ export class StaffRecordController {
   addStaff(@Body() staffDetails: AddStaffRecordDTO) {
     return this.service.addStaff(staffDetails);
   }
+  
+  @Get('active-staff')
+  getActiveStaff() {
+    return this.service.getActiveStaff();
+  }
 
   @Patch('update-staff')
   updateStaffInfo(@Body() staffDetails: UpdateStaffRecordDTO) {

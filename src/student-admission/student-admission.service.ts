@@ -6,11 +6,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, Repository } from 'typeorm';
-import { AddStudentDto, UpdateStudentRecordDTO } from './dto/student-admission.dto';
+import {
+  AddStudentDto,
+  UpdateStudentRecordDTO,
+} from './dto/student-admission.dto';
 import { Student } from './entities/student.entities';
 import { AcademicInfo } from './entities/academic-info.entities';
 import { BankDetails } from './entities/bank-details.entities';
-
 
 @Injectable()
 export class StudentAdmissionService {
@@ -23,10 +25,9 @@ export class StudentAdmissionService {
 
     @InjectRepository(BankDetails)
     private bankRepo: Repository<BankDetails>,
-  ) { }
+  ) {}
 
-  async addStudent(dto: AddStudentDto): Promise<Student> {
-
+  async addStudent(dto: AddStudentDto): Promise<{ message: any; status: any }> {
     const existingStudents = await this.studentRepo.find({
       where: {
         email: dto.email,
@@ -42,7 +43,9 @@ export class StudentAdmissionService {
     );
 
     if (match) {
-      throw new ConflictException('Student with this email, phone number and grade already exists');
+      throw new ConflictException(
+        'Student with this email, phone number and grade already exists',
+      );
     }
 
     const student = this.studentRepo.create({
@@ -78,7 +81,10 @@ export class StudentAdmissionService {
     await this.academicRepo.save(academicInfo);
     await this.bankRepo.save(bankInfo);
 
-    return savedStudent;
+    return {
+      message: 'Student Added Successfully',
+      status: 201,
+    };
   }
 
   async updateStudentInfo(dto: UpdateStudentRecordDTO) {
@@ -113,7 +119,9 @@ export class StudentAdmissionService {
 
     await this.studentRepo.save(student);
 
-    const academicInfo = await this.academicRepo.findOne({ where: { id: academicInfoId } });
+    const academicInfo = await this.academicRepo.findOne({
+      where: { id: academicInfoId },
+    });
     if (academicInfo) {
       Object.assign(academicInfo, {
         gradeApplyingFor: dto.gradeApplyingFor,
@@ -123,7 +131,9 @@ export class StudentAdmissionService {
       await this.academicRepo.save(academicInfo);
     }
 
-    const bankDetail = await this.bankRepo.findOne({ where: { id: bankDetailsId } });
+    const bankDetail = await this.bankRepo.findOne({
+      where: { id: bankDetailsId },
+    });
     if (bankDetail) {
       Object.assign(bankDetail, {
         accountHolderName: dto.accountHolderName,
@@ -134,10 +144,19 @@ export class StudentAdmissionService {
       await this.bankRepo.save(bankDetail);
     }
 
-    return 'done';
+    return 'updated successfully';
   }
 
-  async getStudentsList(page: number, limit: number, studentStatus: string, searchTerm: string) {
+  async getActiveStudent() {
+    return await this.studentRepo.count({ where: { isDelete: false } });
+  }
+
+  async getStudentsList(
+    page: number,
+    limit: number,
+    studentStatus: string,
+    searchTerm: string,
+  ) {
     let userStatusCondition: any = { isDelete: false };
 
     if (studentStatus === 'active') {
@@ -165,7 +184,7 @@ export class StudentAdmissionService {
       order: { createdAt: 'ASC' },
     });
 
-    const studentIds = students.map(s => s.id);
+    const studentIds = students.map((s) => s.id);
 
     if (studentIds.length === 0) {
       return {
@@ -196,7 +215,7 @@ export class StudentAdmissionService {
       return acc;
     }, {});
 
-    const data = students.map(student => {
+    const data = students.map((student) => {
       const {
         studentId: _aStudentId,
         createdAt: _aCreated,
@@ -232,7 +251,6 @@ export class StudentAdmissionService {
         bankDetails,
       };
     });
-
     return {
       data,
       total,
@@ -246,7 +264,7 @@ export class StudentAdmissionService {
     const student = await this.studentRepo.findOne({ where: { id: uuid } });
 
     if (!student) {
-      throw new NotFoundException('Staff not found');
+      throw new NotFoundException('student not found');
     }
 
     student.isDelete = true;
@@ -254,13 +272,13 @@ export class StudentAdmissionService {
 
     await this.studentRepo.delete(student);
 
-    return { message: 'Staff removed successfully' };
+    return { message: 'student removed successfully' };
   }
 
-  async getStudent(contact: string, gradeApplyingFor:string, email: string) {
+  async getStudent(contact: string, gradeApplyingFor: string, email: string) {
     const student = await this.studentRepo.findOne({
       where: {
-        phoneNumber:contact,
+        phoneNumber: contact,
         email,
         academicInfo: {
           gradeApplyingFor,
@@ -269,9 +287,8 @@ export class StudentAdmissionService {
       relations: ['academicInfo'],
     });
     if (!student) {
-      throw new NotFoundException('Student not found with given name and DOB');
+      throw new NotFoundException('Invalid Credentials');
     }
     return student;
   }
 }
-

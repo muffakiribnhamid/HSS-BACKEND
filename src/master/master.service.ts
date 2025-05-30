@@ -71,7 +71,7 @@ export class MasterService {
   async findByEmail(email: string): Promise<Master> {
     const user = await this.repo.findOne({ where: { email } });
     if (!user) {
-      throw new NotFoundException(`User with email "${email}" not found`);
+      throw new NotFoundException(`Invalid email or password`);
     }
     return user;
   }
@@ -83,7 +83,7 @@ export class MasterService {
   async update(id: number, updateDto: MasterDto) {
     const existing = await this.repo.findOne({ where: { id } });
     if (!existing) {
-      throw new NotFoundException(`User with id "${id}" not found`);
+      throw new NotFoundException(`User Not Found`);
     }
     const updatedDetails = { ...updateDto, createdAt: new Date().toISOString() };
 
@@ -94,9 +94,9 @@ export class MasterService {
   async remove(id: number) {
     const result = await this.repo.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException(`User with id "${id}" not found`);
+      throw new NotFoundException(`User Not Found`);
     }
-    return { message: `User with id ${id} removed successfully` };
+    return { message: `User removed successfully` };
   }
 }
 
