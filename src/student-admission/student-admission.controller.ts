@@ -15,13 +15,18 @@ import {
 import { StudentAdmissionService } from './student-admission.service';
 import {
   AddStudentDto,
-  UpdateStudentRecordDTO
+  UpdateStudentRecordDTO,
 } from './dto/student-admission.dto';
 import { Response } from 'express';
 
 @Controller('student-admission')
 export class StudentAdmissionController {
-  constructor(private readonly service: StudentAdmissionService) { }
+  constructor(private readonly service: StudentAdmissionService) {}
+
+  @Get('active-student')
+  getActiveStaff() {
+    return this.service.getActiveStudent();
+  }
 
   @Post('add-student')
   addStudent(@Body() dto: AddStudentDto) {
@@ -38,31 +43,37 @@ export class StudentAdmissionController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('studentStatus') status: string,
-    @Query('search') search: string
+    @Query('search') search: string,
   ) {
     const pageNum = Number(page) || 1;
     const limitNum = Number(limit) || 10;
     const studentStatus = status?.trim() || '';
-    console.log('innn',studentStatus);
+    console.log('innn', studentStatus);
     const searchTerm = search?.trim() || '';
-    return this.service.getStudentsList(pageNum, limitNum, studentStatus, searchTerm);
+    return this.service.getStudentsList(
+      pageNum,
+      limitNum,
+      studentStatus,
+      searchTerm,
+    );
   }
 
   @Delete('remove-student/:uuid')
-  removeStaff(@Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string) {
+  removeStaff(
+    @Param('uuid', new ParseUUIDPipe({ version: '4' })) uuid: string,
+  ) {
     return this.service.removeStudent(uuid);
   }
-  
-  @Get("student")
+
+  @Get('student')
   async getStudentByNameAndDob(
     @Query('contact') contact: string,
     @Query('gradeApplyingFor') gradeApplyingFor: string,
-    @Query('email') email: string
+    @Query('email') email: string,
   ) {
     if (!contact || !gradeApplyingFor || !email) {
       throw new NotFoundException();
     }
     return await this.service.getStudent(contact, gradeApplyingFor, email);
   }
-
 }
