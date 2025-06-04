@@ -1,6 +1,14 @@
-import { AddStaffRecordDTO, UpdateStaffRecordDTO } from './dto/staff-record.dto';
+import {
+  AddStaffRecordDTO,
+  UpdateStaffRecordDTO,
+} from './dto/staff-record.dto';
 import { StaffRecord } from './entities/staff-record.entities';
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 
@@ -9,12 +17,12 @@ export class StaffRecordService {
   constructor(
     @InjectRepository(StaffRecord)
     private readonly repository: Repository<StaffRecord>,
-  ) { }
+  ) {}
 
   async addStaff(staffDetails: AddStaffRecordDTO) {
     try {
       const newStaff = this.repository.create({ ...staffDetails });
-      return await this.repository.save(newStaff);
+      await this.repository.save(newStaff);
     } catch (error) {
       if (error.code === '23505') {
         console.log(error);
@@ -22,8 +30,16 @@ export class StaffRecordService {
       }
       throw new InternalServerErrorException('Failed to add staff');
     }
+    return {
+      status: 201,
+      message: 'new staff added successfully'
+    }
   }
-  
+
+  async getActiveStaff() {
+    return await this.repository.count({ where: { isDelete: false } });
+  }
+
   async updateStaffInfo(updateStaffDto: UpdateStaffRecordDTO) {
     const { uuid } = updateStaffDto;
     const staff = await this.repository.findOne({ where: { uuid } });
@@ -42,9 +58,13 @@ export class StaffRecordService {
     };
   }
 
-  async getStaffList(page: number, limit: number, userStatus: string, searchTerm: string) {
+  async getStaffList(
+    page: number,
+    limit: number,
+    userStatus: string,
+    searchTerm: string,
+  ) {
     let userStatusCondition: any = { isDelete: false };
-
 
     if (userStatus === 'active') {
       userStatusCondition.activeStatus = true;
@@ -69,10 +89,12 @@ export class StaffRecordService {
       take: limit,
       order: { createdAt: 'ASC' },
     });
-    const filteredData = data.map(({ id, createdAt, updatedAt, ...rest }) => rest);
+    const filteredData = data.map(
+      ({ id, createdAt, updatedAt, ...rest }) => rest,
+    );
 
     return {
-      data:filteredData,
+      data: filteredData,
       total,
       page,
       limit,
