@@ -9,8 +9,21 @@ import {
 } from 'typeorm';
 
 export enum Role {
-  PROFESSOR = 'PROFESSOR',
+  PROFESSOR = 'PROFESSOR', // Add this line
+
+  PRINCIPAL = 'PRINCIPAL',
+  SR_LECTURER = 'SR_LECTURER',
+  LECTURER = 'LECTURER',
+  MASTER = 'MASTER',
+  
   TEACHER = 'TEACHER',
+  LIBRARIAN = 'LIBRARIAN',
+  SR_ASSISTANT = 'SR_ASSISTANT',
+  JR_ASSISTANT = 'JR_ASSISTANT',
+  LAB_ASSISTANT = 'LAB_ASSISTANT',
+  LIB_ASSISTANT = 'LIB_ASSISTANT',
+  LIB_BEARER = 'LIB_BEARER',
+  MTS = 'MTS',
   OTHER = 'OTHER',
 }
 
@@ -34,15 +47,14 @@ export class StaffRecord {
 
   @Column({
     type: 'enum',
-    enum: Role
+    enum: Role,
   })
   role: Role;
-
 
   @Column({ default: true })
   activeStatus: boolean;
 
-  @Column({default: false})
+  @Column({ default: false })
   isDelete: boolean;
 
   @CreateDateColumn()
