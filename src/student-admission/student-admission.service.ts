@@ -13,6 +13,7 @@ import {
 import { Student } from './entities/student.entities';
 import { AcademicInfo } from './entities/academic-info.entities';
 import { BankDetails } from './entities/bank-details.entities';
+import { CoreEntity } from './entities/core.entities';
 
 @Injectable()
 export class StudentAdmissionService {
@@ -22,6 +23,9 @@ export class StudentAdmissionService {
 
     @InjectRepository(AcademicInfo)
     private academicRepo: Repository<AcademicInfo>,
+
+    // @InjectRepository(CoreEntity)
+    // private CoreEntity: Repository<CoreEntity>,
 
     @InjectRepository(BankDetails)
     private bankRepo: Repository<BankDetails>,
@@ -261,8 +265,9 @@ export class StudentAdmissionService {
   }
 
   async removeStudent(uuid: string) {
+    console.log(uuid);
     const student = await this.studentRepo.findOne({ where: { id: uuid } });
-
+    console.log(student);
     if (!student) {
       throw new NotFoundException('student not found');
     }
@@ -270,7 +275,7 @@ export class StudentAdmissionService {
     student.isDelete = true;
     student.activeStatus = false;
 
-    await this.studentRepo.delete(student);
+    await this.studentRepo.save(student);
 
     return { message: 'student removed successfully' };
   }
