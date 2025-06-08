@@ -10,6 +10,8 @@ export enum Gender {
 
 @Entity()
 export class Student extends CoreEntity {
+  
+  
   @Column()
   fullName: string;
 
