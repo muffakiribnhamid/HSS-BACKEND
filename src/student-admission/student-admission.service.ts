@@ -113,7 +113,7 @@ export class StudentAdmissionService {
       motherName: dto.motherName,
       email: dto.email,
       phoneNumber: dto.phoneNumber,
-      isApprove: dto.activeStatus,
+      activeStatus: dto.activeStatus,
       isDelete: dto.isDelete,
     });
 

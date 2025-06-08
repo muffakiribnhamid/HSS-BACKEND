@@ -1,5 +1,12 @@
-
-import { IsString, IsEmail, IsDateString, IsEnum, IsBoolean, IsUUID } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsDateString,
+  IsEnum,
+  IsBoolean,
+  IsUUID,
+  IsOptional,
+} from 'class-validator';
 import { Gender } from '../entities/student.entities';
 
 class AddStudentDto {
@@ -58,7 +65,8 @@ class AddStudentDto {
   terms?: boolean;
 }
 
-class UpdateStudentRecordDTO extends AddStudentDto {
+// ✅ DTO for updating a student
+class UpdateStudentRecordDTO {
   @IsUUID('4', { message: 'ID must be a valid UUID v4' })
   uuid: string;
 
@@ -67,6 +75,72 @@ class UpdateStudentRecordDTO extends AddStudentDto {
 
   @IsUUID('4')
   bankDetailsId: string;
+
+  @IsString()
+  fullName: string;
+
+  @IsString()
+  address: string;
+
+  @IsEnum(Gender, { message: 'Gender must be Male or Female' })
+  gender: Gender;
+
+  @IsDateString()
+  dob: string;
+
+  @IsString()
+  fatherName: string;
+
+  @IsString()
+  motherName: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  phoneNumber: string;
+
+  @IsString()
+  gradeApplyingFor: string;
+
+  @IsString()
+  previousSchool: string;
+
+  @IsString()
+  shortIntroduction: string;
+
+  @IsString()
+  accountHolderName: string;
+
+  @IsString()
+  accountNumber: string;
+
+  @IsString()
+  bankName: string;
+
+  @IsString()
+  IFSCCode: string;
+
+  @IsBoolean()
+  activeStatus: boolean;
+
+  @IsBoolean()
+  isDelete: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  terms?: boolean;
 }
 
-export { AddStudentDto, UpdateStudentRecordDTO } 
+// class UpdateStudentRecordDTO extends AddStudentDto {
+//   @IsUUID('4', { message: 'ID must be a valid UUID v4' })
+//   uuid: string;
+
+//   @IsUUID('4')
+//   academicInfoId: string;
+
+//   @IsUUID('4')
+//   bankDetailsId: string;
+// }
+
+export { AddStudentDto, UpdateStudentRecordDTO };
